@@ -1,0 +1,503 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define TAMANHO 5570
+#define MAXTAM    200
+#define LINETAM 5000
+#define bool      short
+#define true      1
+#define false     0
+
+
+
+typedef struct Municipio{
+	//recursoshumanos.txt
+	int ID;//A1
+	int numeroFuncionarios;//A2
+	int numeroComissionados;//A5
+
+	//variaveisexternas.txt
+	char  nome[100];//A202
+	char  UF[100];//A201
+	int codigoUF;//A200
+	int populacao;//A204
+	char regiao[100];//A199
+
+	//planejamentourbano.txt
+	char  escolaridade[100];//A16
+	int atualizacaoPlano;//A19
+
+	//gestaoambiental.txt
+	char  estagio[100];//A143
+
+	//recursosparagestao.txt
+	int atualizacaoCadastro;//A63
+
+	//articulacaointerintitucional.txt
+	char consorcio[100];//A152
+}Municipio;
+
+//Metodo que escreve na tela os atributos de cada m especifico
+
+/**
+ * Lista estatica
+ * @author Max do Val Machado adaptada por Stefany Gaspar
+ * @version 3 04/2017
+ */
+//Municipio array[MAXTAM];   // Elementos da pilha
+struct Municipio municipios[TAMANHO];
+struct Municipio array[MAXTAM];
+int n;               // Quantidade de array.
+
+
+/**
+ * Inicializacoes
+ */
+
+void startLista(){
+	n = 0;
+}
+
+
+/**
+ * Insere um elemento na primeira posicao da lista e move os demais
+ * elementos para o fim da
+ * @param x Municipio elemento a ser inserido.
+ */
+void inserirInicio(Municipio x) {
+	int i;
+
+	//validar insercao
+	if(n >= MAXTAM){
+		printf("Erro ao inserir!");
+		exit(1);
+	}
+
+	//levar elementos para o fim do array
+	for(i = n; i > 0; i--){
+		array[i] = array[i-1];
+	}
+
+	array[0] = x;
+	n++;
+}
+
+
+/**
+ * Insere um elemento na ultima posicao da
+ * @param x Municipio elemento a ser inserido.
+ */
+void inserirFim(Municipio x) {
+	//validar insercao
+	if(n >= MAXTAM){
+		printf("Erro ao inserir!");
+		exit(1);
+	}
+
+  array[n] = x;
+	n++;
+}
+
+
+/**
+ * Insere um elemento em uma posicao especifica e move os demais
+ * elementos para o fim da
+ * @param x Municipio elemento a ser inserido.
+ * @param pos Posicao de insercao.
+ */
+void inserir(Municipio x, int pos) {
+	int i;
+
+	//validar insercao
+	if(n >= MAXTAM || pos < 0 || pos > n){
+		printf("Erro ao inserir!");
+		exit(1);
+	}
+
+	//levar elementos para o fim do array
+	for(i = n; i > pos; i--){
+		array[i] = array[i-1];
+	}
+
+	array[pos] = x;
+	n++;
+}
+
+
+/**
+ * Remove um elemento da primeira posicao da lista e movimenta
+ * os demais elementos para o inicio da mesma.
+ * @return resp Municipio elemento a ser removido.
+ */
+Municipio removerInicio() {
+	int i;
+	//validar remocao
+	if (n == 0) {
+		printf("Erro ao remover!");
+		exit(1);
+	}
+
+	Municipio resp = array[0];
+	n--;
+
+	for(i = 0; i < n; i++){
+		array[i] = array[i+1];
+	}
+
+	return resp;
+}
+
+
+/**
+ * Remove um elemento da ultima posicao da
+ * @return resp Municipio elemento a ser removido.
+ */
+Municipio removerFim() {
+
+	//validar remocao
+	if (n == 0) {
+		printf("Erro ao remover!");
+		exit(1);
+	}
+
+	return array[--n];
+}
+
+
+/**
+ * Remove um elemento de uma posicao especifica da lista e
+ * movimenta os demais elementos para o inicio da mesma.
+ * @param pos Posicao de remocao.
+ * @return resp Municipio elemento a ser removido.
+ */
+Municipio remover(int pos) {
+	int i;
+
+	//validar remocao
+	if (n == 0 || pos < 0 || pos >= n) {
+		printf("Erro ao remover!");
+		exit(1);
+	}
+
+	Municipio resp = array[pos];
+	n--;
+
+	for(i = pos; i < n; i++){
+		array[i] = array[i+1];
+	}
+
+	return resp;
+}
+
+void imprimir(int pos){
+	printf("%d %s %s %d %d %d %d %s %s %d %s %d %s\n", array[pos].ID, array[pos].nome, array[pos].UF, array[pos].codigoUF, array[pos].populacao, array[pos].numeroFuncionarios, array[pos].numeroComissionados, array[pos].escolaridade, array[pos].estagio, array[pos].atualizacaoPlano, array[pos].regiao, array[pos].atualizacaoCadastro, array[pos].consorcio);
+}//fim imprimir
+
+void mostrar (){
+	for(int i = 0; i < n; i++){
+		imprimir(i);
+	}
+}
+
+/**
+ * Classe Municipio em C
+ * @author Stefany Gaspar Xavier Franca
+ * @version 2 14/04/2017
+ */
+char** split(char* sFrase){
+	char** frase1 = (char**) malloc(16*sizeof(char*));
+	char *naoAcabou;
+	naoAcabou = strtok(sFrase, "\t\r\n\f\v");
+	int i = 0;
+	while(naoAcabou){
+		frase1[i] = (char*) malloc(sizeof(char*));
+		frase1[i] = naoAcabou;
+		naoAcabou = strtok('\0', "\t\r\n\f\v");
+		i++;
+	}
+	return frase1;
+}
+
+char** splitES(char* sFrase){
+	char** frase1 = (char**) malloc(16*sizeof(char*));
+	char *naoAcabou;
+	naoAcabou = strtok(sFrase, " ");
+	int i = 0;
+	while(naoAcabou){
+		frase1[i] = (char*) malloc(sizeof(char*));
+		frase1[i] = naoAcabou;
+		naoAcabou = strtok('\0', " ");
+		i++;
+	}
+	return frase1;
+}
+
+int length(char* str){
+	int qtd = 0;
+	int i = 0;
+	while(str[i] != '\0'){
+		if(str[i] == '\t'){
+			qtd++;
+		}
+		i++;
+	}
+	return qtd;
+}
+
+void recursosHumanos(){
+	char str[LINETAM];
+	FILE *ponteiro;
+	int posID = 0;
+	int posNuFuncionarios = 0;
+	int posNuComissionados = 0;
+	ponteiro = fopen("/tmp/recursoshumanos.txt","r");
+	fgets(str, LINETAM, ponteiro);
+	int tam = length(str);
+	char** frase = split(str);
+	for(int i = 0; i < tam; i++){
+		if((strcmp(frase[i],"A1")) == 0){
+			posID = i;
+		}//fim if
+		if((strcmp(frase[i],"A2")) == 0){
+			posNuFuncionarios = i;
+		}//fim if
+		if((strcmp(frase[i],"A5")) == 0){
+			posNuComissionados = i;
+		}//fim if
+	}//fim for
+	int fim;
+	int i = 0;
+	while (!feof(ponteiro) && i < TAMANHO)
+  {
+		fgets(str, LINETAM, ponteiro);
+		char** frase1 = split(str);
+		municipios[i].ID = atoi(frase1[posID]);
+		municipios[i].numeroFuncionarios = atoi(frase1[posNuFuncionarios]);
+		municipios[i].numeroComissionados = atoi(frase1[posNuComissionados]);
+		i++;
+	}//fim for
+	fclose(ponteiro);
+}//fim recursosHumanos
+
+void variaveisExternas(){
+	char str[LINETAM];
+	FILE *ponteiro;
+	int posNome = 0;
+	int posUF = 0;
+	int posCodigoUF = 0;
+	int posPopulacao = 0;
+	int posRegiao = 0;
+	ponteiro = fopen("/tmp/variaveisexternas.txt","r");
+	fgets(str, LINETAM, ponteiro);
+	int tam = length(str);
+	char** frase = split(str);
+	char *teste = NULL;
+	for(int i = 0; i <= tam; i++){
+		teste = strdup(frase[i]);
+		if(strcmp(frase[i],"A202")==0){
+			posNome = i;
+		}//fim if
+		if(strcmp(frase[i],"A201")==0){
+			posUF = i;
+		}//fim if
+		if(strcmp(frase[i],"A200")==0){
+			posCodigoUF = i;
+		}//fim if
+		if(strcmp(teste,"A204")==0){
+			posPopulacao = i;
+		}
+		if(strcmp(teste,"A199")==0){
+			posRegiao = i;
+		}//fim if
+	}//fim for
+	int fim;
+	int i = 0;
+	while (!feof(ponteiro) && i < TAMANHO)
+	{
+		fgets(str, LINETAM, ponteiro);
+		char** frase1 = split(str);
+		strcpy(municipios[i].nome , frase1[posNome]);
+		strcpy(municipios[i].UF , frase1[posUF]);
+		municipios[i].codigoUF = atoi(frase1[posCodigoUF]);
+		municipios[i].populacao = atoi(frase1[posPopulacao]);
+		strcpy(municipios[i].regiao , frase1[posRegiao]);
+		i++;
+	}//fim for
+	fclose(ponteiro);
+}//fim variaveisExternas
+
+void planejamentoUrbano(){
+	char str[LINETAM];
+	FILE *ponteiro;
+	int posEscolaridade = 0;
+	int posAtualizacaoPlano = 0;
+	ponteiro = fopen("/tmp/planejamentourbano.txt","r");
+	fgets(str, LINETAM, ponteiro);
+	int tam = length(str);
+	char** frase = split(str);
+	for(int i = 0; i < tam; i++){
+		if(strcmp(frase[i],"A16")==0){
+			posEscolaridade = i;
+		}//fim if
+		if(strcmp(frase[i],"A19")==0){
+			posAtualizacaoPlano = i;
+		}//fim if
+	}//fim for
+	int fim;
+	int i = 0;
+	while (!feof(ponteiro) && i < TAMANHO)
+  {
+		fgets(str, LINETAM, ponteiro);
+		char** frase1 = split(str);
+		strcpy(municipios[i].escolaridade , (frase1[posEscolaridade]));
+		municipios[i].atualizacaoPlano = atoi(frase1[posAtualizacaoPlano]);
+		i++;
+	}//fim for
+	fclose(ponteiro);
+}//fim planejamentoUrbano
+
+void gestaoAmbiental(){
+	char str[LINETAM];
+	FILE *ponteiro;
+	int posEstagio = 0;
+	ponteiro = fopen("/tmp/gestaoambiental.txt","r");
+	fgets(str, LINETAM, ponteiro);
+	int tam = length(str);
+	char** frase = split(str);
+	for(int i = 0; i < tam; i++){
+		if(strcmp(frase[i],"A143")==0){
+			posEstagio = i;
+		}//fim if
+	}//fim for
+
+	int fim;
+	int i = 0;
+	while (!feof(ponteiro) && i < TAMANHO)
+  {
+		fgets(str, LINETAM, ponteiro);
+		char** frase1 = split(str);
+		strcpy(municipios[i].estagio , (frase1[posEstagio]));
+		i++;
+	}//fim for
+	fclose(ponteiro);
+}//fim planejamentoUrbano
+
+void recursosparaGestao(){
+	char str[LINETAM];
+	FILE *ponteiro;
+	int posAtualizacaoCadastro = 0;
+	ponteiro = fopen("/tmp/recursosparagestao.txt","r");
+	fgets(str, LINETAM, ponteiro);
+	int tam = length(str);
+	char** frase = split(str);
+	for(int i = 0; i < tam; i++){
+		if(strcmp(frase[i],"A63")==0){
+			posAtualizacaoCadastro = i;
+		}//fim if
+	}//fim for
+	int fim;
+	int i = 0;
+	while (!feof(ponteiro) && i < TAMANHO)
+	{
+		fgets(str, LINETAM, ponteiro);
+		char** frase1 = split(str);
+		municipios[i].atualizacaoCadastro = atoi(frase1[posAtualizacaoCadastro]);
+		i++;
+	}//fim for
+	fclose(ponteiro);
+}//fim recursosparaGestao
+
+void articulacaoInterintitucional(){
+	char str[LINETAM];
+	FILE *ponteiro;
+	int posConsorcio = 0;
+	ponteiro = fopen("/tmp/articulacaoointerinstitucional.txt","r");
+	fgets(str, LINETAM, ponteiro);
+	int tam = length(str);
+	char** frase = split(str);
+	for(int i = 0; i < tam; i++){
+		if(strcmp(frase[i],"A152")==0){
+			posConsorcio = i;
+		}//fim if
+	}//fim for
+	int fim;
+	int i = 0;
+	while (!feof(ponteiro) && i < TAMANHO)
+  {
+		fgets(str, LINETAM, ponteiro);
+		char** frase1 = split(str);
+		if(strcmp(frase1[posConsorcio],"Sim")){
+			strcpy(municipios[i].consorcio , "false");
+		} else {
+			strcpy(municipios[i].consorcio , "true");
+		}
+
+		i++;
+	}//fim for
+	fclose(ponteiro);
+}//fim articulacaoInterintitucional
+
+
+void le(){
+	recursosHumanos();
+	variaveisExternas();
+	planejamentoUrbano();
+	gestaoAmbiental();
+	recursosparaGestao();
+	articulacaoInterintitucional();
+}//fim le
+
+/**
+ * Classe TP03Q05
+ * @author Stefany Gaspar Xavier Franca
+ * @version 1 04/2017
+ */
+
+int main(){
+	//char  str[2000];
+	int i = 0;
+	int j = 0;
+	char str[LINETAM];
+	int pos;
+	startLista();
+	le();
+	scanf("%d\n", &pos);
+	while(pos != 0){
+		inserirFim(municipios[pos-1]);
+		scanf("%d\n", &pos);
+	}//fim while
+	int qtd = 0;
+	scanf("%d\n", &qtd); //le os 35
+	while(qtd > 0){
+		fgets(str, LINETAM, stdin);
+		char** frase = splitES(str);
+		if((strstr(str,"II"))!= NULL){
+			i = atoi(frase[1]);
+			inserirInicio(municipios[i-1]);
+		}
+		else if((strstr(str,"IF"))!= NULL){
+			i = atoi(frase[1]);
+			inserirFim(municipios[i-1]);
+		}
+		else if((strstr(str,"RI"))!= NULL){
+			Municipio m = removerInicio();
+			printf("(R) %s\n", m.nome);
+		}
+		else if((strstr(str,"RF"))!= NULL){
+			Municipio n = removerFim();
+			printf("(R) %s\n", n.nome);
+		}
+		else if((strstr(str,"R*"))!= NULL){
+			i = atoi(frase[1]);
+			Municipio p = remover(i);
+			printf("(R) %s\n", p.nome);
+		}
+		else if((strstr(str,"I*"))!= NULL){
+			i = atoi(frase[1]);
+			j = atoi(frase[2]);
+			inserir(municipios[j-1],i);
+		}
+		qtd--;
+	}
+	mostrar();
+}//fim main
